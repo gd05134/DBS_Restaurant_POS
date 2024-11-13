@@ -1,40 +1,24 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>Task Master</title>
+<title>Restaurant</title>
 {% endblock %}
  
 
 {% block body %}
 <div class="content">
-    <h1 style="text-align: center;">Task Master</h1>
-
-    {% if tasks | length < 1 %}
-    <h4 style="text-align: center;">There are no tasks, Create One Below!</h4>
-    {% else %}
-    <table border="1" frame="box" rules="all" style="width:70%">
-        <tr>
-            <th>Task</th>
-            <th>Added</th>
-            <th>Actions</th>
-        </tr>
-        {% for task in tasks %}
-            <tr>
-            <td>{{ task.content }}</td> 
-            <td>{{ task.date_created.date() }}</td> 
-            <td>
-                <a href="/delete/{{ task.id }}">Delete</a>
-                <br>
-                <a href="/update/{{ task.id }}">Update</a>
-            </td> 
-            </tr>
-        {% endfor %}
-    </table>
-    {% endif %}
-
-    <form action="/" method="POST">
-        <input type="text" name="content" id="content">
-        <input type="submit" value="Add Task">
+    <h1 style="text-align: center;">Table Layout</h1>
+    <form action="/order" method="get">
+        <button class="smalltable" style="position: relative;top: 100px; left: 100px;">1</button>
+        <button class="smalltable" style="position: relative;top: 100px; left: 200px;">2</button>
+        <button class="smalltable" style="position: relative;top: 100px; left: 300px;">3</button>
+        <button class="smalltable" style="position: relative;top: 100px; left: 400px;">4</button>
+        <button class="smalltable" style="position: relative;top: 300px; left: -320px;">5</button>
+        <button class="smalltable" style="position: relative;top: 300px; left: -220px;">6</button>
+        <button class="smalltable" style="position: relative;top: 300px; left: -120px;">7</button>
+        <button class="smalltable" style="position: relative;top: 300px; left: -20px;">8</button>
+        <button class="largetable" style="position: relative;top: 350px; left: 150px;">9</button>
+        <button class="largetable" style="position: relative;top: 350px; left: 350px;">10</button>
     </form>
 </div>
 {% endblock %}
