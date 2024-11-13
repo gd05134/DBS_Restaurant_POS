@@ -5,6 +5,14 @@ body, html {
     color: white;
 }
 
+h1 {
+    margin: 5px;
+}
+
+h6 {
+    margin: 5px;
+}
+
 .smalltable {
     height: 150px;
     width: 100px;
@@ -38,9 +46,10 @@ th {
     padding: 5px;
 } */
 
-/* .form {
+.form {
+    align-self: center;
     margin-top: 20px;
-} */
+}
 
 /* #content {
     width: 70%;

@@ -7,18 +7,33 @@
 
 {% block body %}
 <div class="content">
+    <form action="/customer" method="get">
+        <button style="position: relative; top: 0px; left: 0px;">Customers</button>
+    </form>
+    <form action="/reservation" method="get">
+        <button style="position: relative; top: -21px; left: 80px;">Reservations</button>
+    </form>
     <h1 style="text-align: center;">Table Layout</h1>
-    <form action="/order" method="get">
-        <button class="smalltable" style="position: relative;top: 100px; left: 100px;">1</button>
-        <button class="smalltable" style="position: relative;top: 100px; left: 200px;">2</button>
-        <button class="smalltable" style="position: relative;top: 100px; left: 300px;">3</button>
-        <button class="smalltable" style="position: relative;top: 100px; left: 400px;">4</button>
-        <button class="smalltable" style="position: relative;top: 300px; left: -320px;">5</button>
-        <button class="smalltable" style="position: relative;top: 300px; left: -220px;">6</button>
-        <button class="smalltable" style="position: relative;top: 300px; left: -120px;">7</button>
-        <button class="smalltable" style="position: relative;top: 300px; left: -20px;">8</button>
-        <button class="largetable" style="position: relative;top: 350px; left: 150px;">9</button>
-        <button class="largetable" style="position: relative;top: 350px; left: 350px;">10</button>
+    <form id="tableLayout" action="/order/" method="get" class="form">
+        <button id="1" onClick="reply_click(this.id)" class="smalltable" style="position: relative;top: 100px; left: 100px;">1</button>
+        <button id="2" onClick="reply_click(this.id)" class="smalltable" style="position: relative;top: 100px; left: 200px;">2</button>
+        <button id="3" onClick="reply_click(this.id)" class="smalltable" style="position: relative;top: 100px; left: 300px;">3</button>
+        <button id="4" onClick="reply_click(this.id)" class="smalltable" style="position: relative;top: 100px; left: 400px;">4</button>
+        <button id="5" onClick="reply_click(this.id)" class="smalltable" style="position: relative;top: 300px; left: -320px;">5</button>
+        <button id="6" onClick="reply_click(this.id)" class="smalltable" style="position: relative;top: 300px; left: -220px;">6</button>
+        <button id="7" onClick="reply_click(this.id)" class="smalltable" style="position: relative;top: 300px; left: -120px;">7</button>
+        <button id="8" onClick="reply_click(this.id)" class="smalltable" style="position: relative;top: 300px; left: -20px;">8</button>
+        <button id="9" onClick="reply_click(this.id)" class="largetable" style="position: relative;top: 350px; left: 150px;">9</button>
+        <button id="10" onClick="reply_click(this.id)" class="largetable" style="position: relative;top: 350px; left: 350px;">10</button>
     </form>
 </div>
+
+<script type="text/javascript">
+     function reply_click(clicked_id) {
+        const form = document.getElementById("tableLayout");
+        form.action = "/order/" + clicked_id;  // Set the table ID as part of the action URL
+        form.submit(); // Submit the form with the updated action URL
+        event.preventDefault(); // Prevent the default form action
+    }
+</script>
 {% endblock %}

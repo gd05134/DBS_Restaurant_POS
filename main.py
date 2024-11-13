@@ -3,6 +3,8 @@ from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
+#global variables if needed
+
 #Create Flask App
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///restaurant_pos.db'
@@ -29,8 +31,8 @@ class Customer(db.Model):
     cust_id = db.Column(db.Integer, primary_key=True)                                 #Add Auto Increment
     cust_first_name = db.Column(db.String(50), nullable=False)                  
     cust_last_name = db.Column(db.String(50), nullable=False)
-    phone_no = db.Column(db.String(10), nullable=False)                               #How to make unique?
-    email = db.Column(db.String(60), nullable=False)                                  #How to make unique?
+    phone_no = db.Column(db.String(10), unique=True, nullable=False)                               
+    email = db.Column(db.String(60), unique=True, nullable=False)                                
     pref_table = db.Column(db.Integer, db.ForeignKey("table.table_id"))               
 
     def __init__(self, cust_id, cust_first_name, cust_last_name, phone_no, email, pref_table):
@@ -43,8 +45,8 @@ class Customer(db.Model):
 
 #Table Schema
 class Table(db.Model):
-    table_id = db.Column(db.Integer, primary_key=True, nullable=False)                                  #How to make unique?
-    capacity = db.Column(db.Integer, nullable=False)                                  #How to make unique?
+    table_id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)                                  
+    capacity = db.Column(db.Integer, unique=True, nullable=False)                                 
     loc = db.Column(db.String(20))
     
     def __init__(self, table_id, capacity, loc):
@@ -83,7 +85,7 @@ class Payment(db.Model):
 #MenuCategory Schema
 class MenuCat(db.Model):
     category_id = db.Column(db.Integer, primary_key=True, nullable=False)                               #increments
-    name = db.Column(db.String(30), nullable=False)                                   #Unique?
+    name = db.Column(db.String(30), unique=True, nullable=False)                                  
 
     def __init__(self, category_id, name):
         self.category_id = category_id
@@ -93,7 +95,7 @@ class MenuCat(db.Model):
 class MenuItem(db.Model):
     menu_item_id = db.Column(db.Integer, primary_key=True, nullable=False)                              #Increments
     category_id = db.Column(db.Integer, db.ForeignKey("menu_cat.category_id"), nullable=False)                               
-    name = db.Column(db.String(50), nullable=False)                                   #Unique?
+    name = db.Column(db.String(50), unique=True, nullable=False)                                  
     desc = db.Column(db.String(200))
     price = db.Column(db.Integer, nullable=False)                                     #Change to decimal
 
@@ -118,81 +120,65 @@ class OrderItem(db.Model):
         self.menu_item_id = menu_item_id
         self.quantity = quantity
         self.special_instructions = special_instructions
-        
-#Create Database, run once then comment out when db is created
-# with app.app_context():
-#    db.create_all()
-for i in range(10):
 
-    db
-
-#Code to write to the App
-#Open App
-#These are the old functions, we need to entirely gut these for our own purposes 
-#@app.route('/')
-# def index():
-#     if request.method == 'POST':
-#         task_content = request.form['content']
-
-#         new_task = Todo(content=task_content)
-
-#         try:
-#             db.session.add(new_task)
-#             db.session.commit()
-#             return redirect('/')
-#         except:
-#             return 'There was an issue adding your task'
-        
-#     else:
-#        tasks = Todo.query.order_by(Todo.date_created).all()
-#        return render_template('index.html',tasks=tasks)
-
-# #Delete Content
-# @app.route('/delete/<int:id>')
-# def delete(id):
-#     task_to_delete = Todo.query.get_or_404(id)
-#     try:
-#         db.session.delete(task_to_delete)
-#         db.session.commit()
-#         return redirect('/')
-#     except:
-#         return 'There was a problem deleting that task'
-
-# #Update Site 
-# @app.route('/update/<int:id>', methods=['GET', 'POST'])
-# def update(id):
-#     task = Todo.query.get_or_404(id)
-#     if request.method == 'POST':
-#         task.content = request.form['content']
-#         try:
-#             db.session.commit()
-#             return redirect('/')
-#         except:
-#                return 'There was an issue updating your task'
-#     else:
-#         return render_template('update.html', task=task)
+#Main Restaurant Layout
 @app.route('/', methods=['GET','POST'])
 def index():
     if request.method == 'POST':
         try:
+            
             db.session.commit()
-            return redirect('/order/')
+            return redirect(url_for('order'))
         except:
                return 'There was an issue opening the order'
     else:
         return render_template('index.html')
 
-@app.route('/order/', methods=['GET','POST'])
-def update():
+#To enter Order state
+@app.route('/order/<table_id>', methods=['GET','POST'])
+def order(table_id):
+     table = Table.query.get_or_404(table_id)
      if request.method == 'POST':
         try:
             db.session.commit()
-            return redirect('/')
+            return redirect(url_for('index'))
         except:
                return 'There was an issue opening the layout'
      else:
-        return render_template('order.html')
+        return render_template('order.html', table = table)
+
+#For Customers
+customer_id = 0
+@app.route('/customer', methods=['GET','POST'])
+def add_customer():
+    if request.method == 'POST':
+        first_name = request.form['First Name']
+        last_name = request.form['Last Name']
+        phone_no = request.form['Phone No.']
+        email = request.form['Email']
+        pref_table = request.form.get('Preferred Table')
+        try:
+            db.session.add(Customer(cust_id=customer_id, first_name=first_name, last_name=last_name, phone_no=phone_no, email=email, pref_table=pref_table))
+            customer_id += 1
+            db.session.commit()
+            return redirect(url_for('index'))
+        except:
+               return 'There was an issue entering your information'
+    else:
+        return render_template('customer.html')
+
+#For reservations
+@app.route('/reservation', methods=['GET','POST'])
+def add_reservation():
+    if request.method == 'POST':
+      
+        try:
+            db.session.commit()
+            return redirect(url_for('/'))
+        except:
+               return 'There was an issue reserving your table'
+    else:
+        return render_template('reservation.html')
 
 if __name__ == '__main__':
      app.run(debug=True)
-    
