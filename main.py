@@ -213,16 +213,15 @@ def add_reservation():
         return render_template('reservation.html', reservations = reservations, customers = customers)
 
 @app.route('/menu', methods=['GET','POST'])
-def order(table_id):
-     table = Table.query.get_or_404(table_id)
+def order():
      if request.method == 'POST':
         try:
             db.session.commit()
-            return redirect(url_for('index'))
+            return redirect('/menu')
         except:
                return 'There was an issue opening the layout'
      else:
-        return render_template('order.html', table = table)
+        return render_template('menu.html')
 
 if __name__ == '__main__':
      app.run(debug=True)
