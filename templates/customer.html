@@ -9,19 +9,36 @@
     <form action="/" method="GET">
         <button>Return to Layout</button>
     </form>
-    <h1 style="text-align: center;">Add New Customer</h1>
+    <h1 style="text-align: center;">Customer Manager</h1>
+    <table align="right">
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Contact</th>
+          <th>Preferred Table</th>
+        </tr>
+        {% for customer in customers %}
+        <tr> 
+          <td>{{customer.cust_id}} </td>
+          <td>{{customer.cust_last_name}}, {{customer.cust_first_name}}</td>
+          <td>{{customer.phone_no}}, {{customer.email}}</td>
+          <td>{{customer.pref_table}}</td>
+        </tr>
+        {% endfor %}
+    </table>
     <div class="form">
-        <form action="/customer" method="POST" style="text-align: center;">
+        <form action="/customer" method="POST">
+            <h5>Add Customer</h5>
             <h6>First Name</h6>
-            <input type="text" name="First Name" id="first_name" value="{{first_name}}">
+            <input type="text" name="First Name" id="first_name">
             <h6>Last Name</h6>
-            <input type="text" name="Last Name" id="last_name" value="{{last_name}}">
+            <input type="text" name="Last Name" id="last_name">
             <h6>Phone Number</h6>
-            <input type="text" name="Phone No." id="phone_no" value="{{email}}">
+            <input type="text" name="Phone No." id="phone_no">
             <h6>Email</h6>
-            <input type="text" name="Email" id="email" value="{{phone_no}}">
+            <input type="text" name="Email" id="email">
             <h6>Preferred Table: 1-10</h6>
-            <input type="text" name="Preferred Table" id="pref_table" value="{{pref_table}}">
+            <input type="text" name="Preferred Table" id="pref_table">
             <input type="submit" name="Enter Info">
         </form>
     </div>

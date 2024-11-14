@@ -6,6 +6,33 @@
  
 {% block body %}
 <div class="content">
+    <form action="/" method="GET">
+        <button>Return to Layout</button>
+    </form>
     <h1 style="text-align: center;">Reservation Manager</h1>
+    <table align="right">
+        <tr>
+          <th>ID</th>
+          
+          <th>Date</th>
+          
+        </tr>
+        {% for reservation in reservations %}
+        <tr> 
+          <td>{{reservation.cust_id}} </td>
+          
+          <td>{{reservation.date_reserved}}</td>
+          
+        </tr>
+        {% endfor %}
+    </table>
+    <div class="form">
+        <form action="/reservation" method="POST">
+            <h5>Add Reservation</h5>
+            <h6>Enter Customer ID</h6>
+            <input type="text" name="Enter Customer ID" id="enter_customer_id">
+            <input type="submit" name="Enter Info">
+        </form>
+    </div>
 </div>
 {% endblock %}

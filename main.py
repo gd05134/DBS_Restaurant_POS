@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 #global variables if needed
+customer_id = 0
+res_id = 0
 
 #Create Flask App
 app = Flask(__name__)
@@ -61,11 +63,9 @@ class Reservation(db.Model):
     date_created = db.Column(db.DateTime, default = datetime.today(), nullable=False) #idk if this is the right datetime function, will change later
     date_reserved = db.Column(db.DateTime, default = datetime.today(), nullable=False)#pulls current time, find function to pull select time
 
-    def __init__(self, reservation_id, cust_id, date_created, date_reserved):
+    def __init__(self, reservation_id, cust_id):
         self.reservation_id = reservation_id
         self.cust_id = cust_id
-        self.date_created = date_created
-        self.date_reserved = date_reserved
 
 #Payment Schema
 class Payment(db.Model):
@@ -148,37 +148,45 @@ def order(table_id):
         return render_template('order.html', table = table)
 
 #For Customers
-customer_id = 0
 @app.route('/customer', methods=['GET','POST'])
 def add_customer():
+    global customer_id 
     if request.method == 'POST':
-        first_name = request.form['First Name']
-        last_name = request.form['Last Name']
+        cust_first_name = request.form['First Name']
+        cust_last_name = request.form['Last Name']
         phone_no = request.form['Phone No.']
         email = request.form['Email']
-        pref_table = request.form.get('Preferred Table')
+        pref_table = request.form['Preferred Table']
         try:
-            db.session.add(Customer(cust_id=customer_id, first_name=first_name, last_name=last_name, phone_no=phone_no, email=email, pref_table=pref_table))
+            db.session.add(Customer(customer_id, cust_first_name, cust_last_name, phone_no, email, pref_table))
             customer_id += 1
             db.session.commit()
-            return redirect(url_for('index'))
+            return redirect('/customer')
         except:
                return 'There was an issue entering your information'
     else:
-        return render_template('customer.html')
+        customers = Customer.query.order_by(Customer.cust_id).all()
+        return render_template('customer.html', customers = customers)
 
 #For reservations
 @app.route('/reservation', methods=['GET','POST'])
 def add_reservation():
+    global reservation_id
     if request.method == 'POST':
-      
+        cust_id = request.form['Enter Customer ID']
         try:
+            db.session.add(Reservation(res_id, cust_id))
+            res_id += 1
             db.session.commit()
-            return redirect(url_for('/'))
+            return redirect(url_for('/reservation'))
         except:
                return 'There was an issue reserving your table'
     else:
-        return render_template('reservation.html')
+        reservations = db.session.execute(db.select(Reservation).order_by(Reservation.reservation_id)).all()
+        return render_template('reservation.html', reservations = reservations)
+
+# with app.app_context():
+#     db.create_all()
 
 if __name__ == '__main__':
      app.run(debug=True)
