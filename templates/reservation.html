@@ -6,6 +6,39 @@
  
 {% block body %}
 <div class="content">
+    <form action="/" method="GET">
+        <button>Return to Layout</button>
+    </form>
     <h1 style="text-align: center;">Reservation Manager</h1>
+    <table align="right">
+        <tr>
+          <th>RID,RCID,CID</th>
+          <th>Customer Name</th>
+          <th>Contact Info</th>
+          <th>Date</th>
+          
+        </tr>
+        {% for reservation in reservations %}
+        {% for customer in customers%}
+        {% if customer.cust_id == reservation.cust_id %}
+        <tr> 
+          <td>{{reservation.reservation_id}}, {{customer.cust_id}}, {{reservation.cust_id}}</td>
+          <td>{{customer.cust_first_name}} {{customer.cust_last_name}}</td>
+          <td>{{customer.phone_no}}, {{customer.email}}</td>
+          <td>{{reservation.date_reserved}}</td>
+          
+        </tr>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+    </table>
+    <div class="form">
+        <form action="/reservation" method="POST">
+            <h5>Add Reservation</h5>
+            <h6>Enter Customer ID</h6>
+            <input type="text" name="Enter Customer ID" id="enter_customer_id">
+            <input type="submit" name="Enter Info">
+        </form>
+    </div>
 </div>
 {% endblock %}

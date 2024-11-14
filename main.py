@@ -1,14 +1,17 @@
 #Import Libraries
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask, render_template, url_for, request, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 #global variables if needed
+customer_id = 0
+res_id = 0
 
 #Create Flask App
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///restaurant_pos.db'
 db = SQLAlchemy(app)
+app.secret_key ='key'
 
 #Initialize Relationship Schema
 #Order Schema
@@ -46,7 +49,7 @@ class Customer(db.Model):
 #Table Schema
 class Table(db.Model):
     table_id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)                                  
-    capacity = db.Column(db.Integer, unique=True, nullable=False)                                 
+    capacity = db.Column(db.Integer, nullable=False)                                 
     loc = db.Column(db.String(20))
     
     def __init__(self, table_id, capacity, loc):
@@ -56,16 +59,14 @@ class Table(db.Model):
 
 #Reservation Schema
 class Reservation(db.Model):
-    reservation_id = db.Column(db.Integer, primary_key=True)                          #Add auto increment
+    reservation_id = db.Column(db.Integer, unique=True, primary_key=True)                          #Add auto increment
     cust_id = db.Column(db.Integer, db.ForeignKey("customer.cust_id"), nullable=False)                        
     date_created = db.Column(db.DateTime, default = datetime.today(), nullable=False) #idk if this is the right datetime function, will change later
     date_reserved = db.Column(db.DateTime, default = datetime.today(), nullable=False)#pulls current time, find function to pull select time
 
-    def __init__(self, reservation_id, cust_id, date_created, date_reserved):
+    def __init__(self, reservation_id, cust_id):
         self.reservation_id = reservation_id
         self.cust_id = cust_id
-        self.date_created = date_created
-        self.date_reserved = date_reserved
 
 #Payment Schema
 class Payment(db.Model):
@@ -121,6 +122,25 @@ class OrderItem(db.Model):
         self.quantity = quantity
         self.special_instructions = special_instructions
 
+# with app.app_context():
+#     # customers = db.session.query(Customer).join(Reservation).filter(Reservation.cust_id == Customer.cust_id).all()
+#     # reservations = Reservation.query.order_by(Reservation.reservation_id).all()
+#     # print(customers)
+#     # print(reservations)
+
+    
+#     db.create_all()
+
+#     #For testing, only run once
+#     db.session.add(Customer(0,"Caelin","Jones","8594892338","jedijones02@gmail.com",7))
+#     db.session.add(Customer(1,"Garth","Daniels","111111111","mark@gmail.com",4))
+#     db.session.add(Customer(2,"Grey","Myers","222222222","larryfied@gmail.com",2))
+#     db.session.add(Customer(3,"Joahna","Ortiz","33333333","wakalover@gmail.com",10))
+#     for i in range(1,11):
+#         db.session.add(Table(i, 4, "Our Restaurant"))
+#     db.session.commit()
+
+
 #Main Restaurant Layout
 @app.route('/', methods=['GET','POST'])
 def index():
@@ -148,37 +168,61 @@ def order(table_id):
         return render_template('order.html', table = table)
 
 #For Customers
-customer_id = 0
 @app.route('/customer', methods=['GET','POST'])
 def add_customer():
+    global customer_id 
     if request.method == 'POST':
-        first_name = request.form['First Name']
-        last_name = request.form['Last Name']
+        cust_first_name = request.form['First Name']
+        cust_last_name = request.form['Last Name']
         phone_no = request.form['Phone No.']
         email = request.form['Email']
-        pref_table = request.form.get('Preferred Table')
+        pref_table = request.form['Preferred Table']
         try:
-            db.session.add(Customer(cust_id=customer_id, first_name=first_name, last_name=last_name, phone_no=phone_no, email=email, pref_table=pref_table))
+            db.session.add(Customer(customer_id, cust_first_name, cust_last_name, phone_no, email, pref_table))
             customer_id += 1
             db.session.commit()
-            return redirect(url_for('index'))
+            return redirect('/customer')
         except:
                return 'There was an issue entering your information'
     else:
-        return render_template('customer.html')
+        #customers = db.session.execute(db.select(Customer).order_by(Customer.cust_id))
+        customers = Customer.query.order_by(Customer.cust_id).all()
+        return render_template('customer.html', customers = customers)
 
 #For reservations
 @app.route('/reservation', methods=['GET','POST'])
 def add_reservation():
+    global res_id
     if request.method == 'POST':
-      
+        cust_id = request.form['Enter Customer ID']
+        existing_reservation = Reservation.query.filter_by(cust_id=cust_id).first()
+    
+        if existing_reservation:
+            return redirect('/reservation')
+        else:
+            try:
+                db.session.add(Reservation(res_id, cust_id))
+                res_id += 1
+                db.session.commit()
+                return redirect('/reservation')
+            except:
+                return 'There was an issue reserving your table'
+    else:
+        reservations = Reservation.query.order_by(Reservation.reservation_id).all() #db.session.execute(db.select(Reservation).order_by(Reservation.reservation_id)).all()
+        customers = db.session.query(Customer).join(Reservation, Reservation.cust_id == Customer.cust_id).all()
+        return render_template('reservation.html', reservations = reservations, customers = customers)
+
+@app.route('/menu', methods=['GET','POST'])
+def order(table_id):
+     table = Table.query.get_or_404(table_id)
+     if request.method == 'POST':
         try:
             db.session.commit()
-            return redirect(url_for('/'))
+            return redirect(url_for('index'))
         except:
-               return 'There was an issue reserving your table'
-    else:
-        return render_template('reservation.html')
+               return 'There was an issue opening the layout'
+     else:
+        return render_template('order.html', table = table)
 
 if __name__ == '__main__':
      app.run(debug=True)
