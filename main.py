@@ -1,5 +1,5 @@
 #Import Libraries
-from flask import Flask, render_template, url_for, request, redirect, flash
+from flask import Flask, render_template, url_for, request, redirect, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -16,16 +16,13 @@ app.secret_key ='key'
 
 #Initialize Relationship Schema
 #Order Schema
-class Order(db.Model):
-    order_id = db.Column(db.Integer, primary_key=True)                                #Add Auto Increment
-    cust_id = db.Column(db.Integer, db.ForeignKey("customer.cust_id"))               
+class Order(db.Model):                                                              # GAD - Removed cust_id from Orders
+    order_id = db.Column(db.Integer, primary_key=True, autoincrement=True)                                #Add Auto Increment     
     table_id = db.Column(db.Integer, db.ForeignKey("table.table_id"))                                                  
     order_time = db.Column(db.DateTime, default = datetime.today(), nullable=False)   #idk if this is the right datetime function, will change later
     total_cost = db.Column(db.Integer, nullable=False)                                #add logic for incrementing later, change to decimal
 
-    def __init__(self, order_id, cust_id, table_id, order_time, total_cost):
-        self.order_id = order_id
-        self.cust_id = cust_id
+    def __init__(self, table_id, order_time, total_cost):
         self.table_id = table_id
         self.order_time = order_time
         self.total_cost = total_cost
@@ -85,31 +82,31 @@ class Payment(db.Model):
 
 #MenuCategory Schema
 class MenuCat(db.Model):
-    category_id = db.Column(db.Integer, primary_key=True, nullable=False)                               #increments
+    category_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)    # GAD - Added autoincrement = True
     name = db.Column(db.String(30), unique=True, nullable=False)                                  
 
-    def __init__(self, category_id, name):
-        self.category_id = category_id
+    def __init__(self, name):
+        #self.category_id = category_id
         self.name = name
+    
+    def __repr__(self):
+        return f'<MenuCat {self.name}>'
 
 #MenuItem Schema
-class MenuItem(db.Model):
-    menu_item_id = db.Column(db.Integer, primary_key=True, nullable=False)                              #Increments
+class MenuItem(db.Model): 
+    menu_item_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)   # GAD - Added autoincrement = True
     category_id = db.Column(db.Integer, db.ForeignKey("menu_cat.category_id"), nullable=False)                               
-    name = db.Column(db.String(50), unique=True, nullable=False)                                  
-    desc = db.Column(db.String(200))
-    price = db.Column(db.Integer, nullable=False)                                     #Change to decimal
+    name = db.Column(db.String(50), unique=True, nullable=False)                    # GAD - Removed "Description"
+    price = db.Column(db.Float, nullable=False)                                     # GAD - Changed to Float (decimal)
 
-    def __init__(self, menu_item_id, category_id, name, desc, price):
-        self.menu_item_id = menu_item_id
+    def __init__(self, category_id, name, price):
         self.category_id = category_id
         self.name = name
-        self.desc = desc
         self.price = price
         
 #OrderItem Schema
 class OrderItem(db.Model):
-    order_item_id = db.Column(db.Integer, primary_key=True)                                            #Increments
+    order_item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)        # GAD - Added autoincrement = True
     order_id = db.Column(db.Integer,db.ForeignKey("order.order_id"), nullable=False)                              
     menu_item_id = db.Column(db.Integer,db.ForeignKey("menu_item.menu_item_id"), nullable=False)                         
     quantity = db.Column(db.Integer, nullable=False)
@@ -121,25 +118,6 @@ class OrderItem(db.Model):
         self.menu_item_id = menu_item_id
         self.quantity = quantity
         self.special_instructions = special_instructions
-
-# with app.app_context():
-#     # customers = db.session.query(Customer).join(Reservation).filter(Reservation.cust_id == Customer.cust_id).all()
-#     # reservations = Reservation.query.order_by(Reservation.reservation_id).all()
-#     # print(customers)
-#     # print(reservations)
-
-    
-#     db.create_all()
-#     #add menu item and menu categories
-#     #For testing, only run once
-
-#     db.session.add(Customer(0,"Caelin","Jones","8594892338","jedijones02@gmail.com",7))
-#     db.session.add(Customer(1,"Garth","Daniels","111111111","mark@gmail.com",4))
-#     db.session.add(Customer(2,"Grey","Myers","222222222","larryfied@gmail.com",2))
-#     db.session.add(Customer(3,"Joahna","Ortiz","33333333","wakalover@gmail.com",10))
-#     for i in range(1,11):
-#         db.session.add(Table(i, 4, "Our Restaurant"))
-#     db.session.commit()
 
 
 #Main Restaurant Layout
@@ -156,7 +134,7 @@ def index():
         return render_template('index.html')
 
 #To enter Order state
-@app.route('/order_manager/<table_id>', methods=['GET','POST'])
+@app.route('/order_manager/<table_id>', methods=['GET', 'POST'])
 def order(table_id):
      table = Table.query.get_or_404(table_id)
      if request.method == 'POST':
@@ -212,16 +190,24 @@ def add_reservation():
         customers = db.session.query(Customer).join(Reservation, Reservation.cust_id == Customer.cust_id).all()
         return render_template('reservation.html', reservations = reservations, customers = customers)
 
-@app.route('/menu', methods=['GET','POST'])
+@app.route('/menu', methods=['GET', 'POST']) # GAD
 def menu():
-     if request.method == 'POST':
+    if request.method == 'POST':
         try:
             db.session.commit()
             return redirect('/menu')
         except:
-               return 'There was an issue opening the menu'
-     else:
-        return render_template('menu.html')
+            return 'There was an issue opening the menu'
+    else:
+        categories = MenuCat.query.all()
+        table = Table.query.first()
+        return render_template('menu.html', categories=categories, table=table)
+
+@app.route('/menu_items/<int:category_id>') # GAD
+def menu_items(category_id):
+    items = MenuItem.query.filter_by(category_id=category_id).all()
+    items_data = [{'name': item.name, 'price': item.price} for item in items]
+    return jsonify(items_data)
      
 @app.route('/payment', methods=['GET','POST'])
 def payment():
@@ -237,6 +223,29 @@ def payment():
      else:
         payments = Payment.query.order_by(Payment.payment_id).all()
         return render_template('payment.html', payments=payments)
+    
+@app.route('/submit_order', methods=['POST']) # GAD
+def submit_order():
+    order_data = request.get_json()
+    table_id = order_data['table_id']
+    order_items = order_data['order_items']
+    total_cost = order_data['total_cost']
+
+    new_order = Order(table_id=table_id, order_time=datetime.now(), total_cost=total_cost)
+    db.session.add(new_order)
+    db.session.commit()
+
+    # Add order items
+    for item in order_items:
+        print(f"item: {item}") #! DEBUG Im gonna blow my brains out I swear to god
+        #! Why can this single piece of shit line not see item['item_name'] wherwe am i MISSING IT???????
+        order_item = OrderItem(order_id=new_order.order_id, item_name=item['item_name'], 
+                               quantity=item['quantity'], special_instructions="")
+        db.session.add(order_item)
+
+    db.session.commit()
+
+    return jsonify({"success": True})
 
 if __name__ == '__main__':
      app.run(debug=True)

@@ -2,12 +2,41 @@
 
 {% block head %}
 <title>Menu</title>
+<link rel="stylesheet" href="{{url_for('static', filename='css/menu_style.css')}}">
 {% endblock %}
-
 
 {% block body %}
 <form onsubmit="window.history.back(); return false;">
     <button type="submit">Return To Table</button>
 </form>
 <h1>Restaurant Menu</h1>
+<div class="menu-container">
+    <div class="order-queue">
+        <h3>Current Order</h3>
+        <ul id="orderList"></ul>
+        <p>Order Total: $<span id="orderTotal">0.00</span></p>
+        <button onclick="submitOrder()">Submit Order</button>
+    </div>
+
+    <!-- Right container for Categories and Menu Items -->
+    <div class="right-container">
+        <!-- Categories row at the top -->
+        <div class="category-row">
+            {% for category in categories %}
+                <button class="category-btn" onclick="loadItems({{category.category_id}})">{{category.name}}</button>
+            {% endfor %}
+        </div>
+
+        <!-- Menu Items Grid below Categories -->
+        <div class="menu-items-grid" id="itemsGrid">
+            <!-- Menu items will populate here depending on the selected category -->
+        </div>
+    </div>
+</div>
+
+<script>
+    const tableId = {{ table.table_id }};
+</script>
+
+<script src="{{url_for('static', filename='js/menu.js')}}"></script>
 {% endblock %}
