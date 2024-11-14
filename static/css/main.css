@@ -42,10 +42,15 @@ table, td, th {
     border: 1px solid #aaa;
 }
 
-/* table {
+.table {
     border-collapse: collapse;
-    width: 100%;
-} */
+    flex: 1 1 auto;
+    display: flex;
+    overflow-y: auto;
+    flex-direction: column;
+    width: 70%;
+    table-layout: fixed;
+}
 
 th {
     height: 30px;

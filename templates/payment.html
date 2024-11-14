@@ -11,12 +11,56 @@
 </form>
 <div align="center">
     <h1>Payment</h1>
-    <select name="payment" id="payment_method">
-        <option value="credit_card">Credit Card</option>
-        <option value="bitcoin">Bitcoin</option>
-        <option value="apple_pay">Apple Pay</option>
-        <option value="cash">Cash</option>
-    </select>
-    <button type="submit">Submit</button>
+    <form action="/" method ="get" onSubmit="submitForm(event)">
+        <select name="payment" id="payment_method">
+            <option value="credit_card">Credit Card</option>
+            <option value="bitcoin">Bitcoin</option>
+            <option value="apple_pay">Apple Pay</option>
+            <option value="cash">Cash</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+    <table class="table">
+        <tr>
+            <th>Payment ID</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Order ID</th>
+        </tr>
+        {% for payment in payments %}
+        <tr> 
+            <td>{{payment.payment_id}}</td>
+            <td>{{payment.price}}</td>
+            <td>{{payment.payment_method}}</td>
+            <td>{{payment.order_id}}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </div>
+<script>
+    function submitForm(event) {
+        // Prevent default form submission
+        event.preventDefault();
+
+        // Get the selected payment method
+        const paymentMethod = document.getElementById("payment_method").value;
+
+        // Send data using fetch API
+        fetch("/", {
+            method: "GET",  // or "POST" if the server expects it
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({ payment: paymentMethod })
+        })
+        .then(response => response.text())
+        .then(data => {
+            // Process response if needed, e.g., show confirmation
+            console.log("Form submitted successfully:", data);
+        })
+        .catch(error => {
+            console.error("Error submitting form:", error);
+        });
+    }
+</script>
 {% endblock %}

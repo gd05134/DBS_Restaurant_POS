@@ -1,6 +1,4 @@
 # DBS_Restaurant_POS V0.2
-DISCLAIMER: This version does not currently run, as the database has not been properly implemented
-
 In order to install requirements.txt, please run the command;
 pip install -r requirements.txt
 

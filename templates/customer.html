@@ -10,7 +10,23 @@
         <button>Return to Layout</button>
     </form>
     <h1 style="text-align: center;">Customer Manager</h1>
-    <table align="right">
+    <div class="form">
+        <form action="/customer" method="POST" align="center">
+            <h5>Add Customer</h5>
+            <h6>First Name</h6>
+            <input type="text" name="First Name" id="first_name">
+            <h6>Last Name</h6>
+            <input type="text" name="Last Name" id="last_name">
+            <h6>Phone Number</h6>
+            <input type="text" name="Phone No." id="phone_no">
+            <h6>Email</h6>
+            <input type="text" name="Email" id="email">
+            <h6>Preferred Table: 1-10</h6>
+            <input type="text" name="Preferred Table" id="pref_table">
+            <input type="submit" name="Enter Info">
+        </form>
+    </div>
+    <table class="table">
         <tr>
           <th>ID</th>
           <th>Name</th>
@@ -26,21 +42,5 @@
         </tr>
         {% endfor %}
     </table>
-    <div class="form">
-        <form action="/customer" method="POST">
-            <h5>Add Customer</h5>
-            <h6>First Name</h6>
-            <input type="text" name="First Name" id="first_name">
-            <h6>Last Name</h6>
-            <input type="text" name="Last Name" id="last_name">
-            <h6>Phone Number</h6>
-            <input type="text" name="Phone No." id="phone_no">
-            <h6>Email</h6>
-            <input type="text" name="Email" id="email">
-            <h6>Preferred Table: 1-10</h6>
-            <input type="text" name="Preferred Table" id="pref_table">
-            <input type="submit" name="Enter Info">
-        </form>
-    </div>
 </div>
 {% endblock %}

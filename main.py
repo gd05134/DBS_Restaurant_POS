@@ -6,6 +6,7 @@ from datetime import datetime
 #global variables if needed
 customer_id = 0
 res_id = 0
+payment_id = 0
 
 #Create Flask App
 app = Flask(__name__)
@@ -129,8 +130,9 @@ class OrderItem(db.Model):
 
     
 #     db.create_all()
-
+#     #add menu item and menu categories
 #     #For testing, only run once
+
 #     db.session.add(Customer(0,"Caelin","Jones","8594892338","jedijones02@gmail.com",7))
 #     db.session.add(Customer(1,"Garth","Daniels","111111111","mark@gmail.com",4))
 #     db.session.add(Customer(2,"Grey","Myers","222222222","larryfied@gmail.com",2))
@@ -223,14 +225,18 @@ def menu():
      
 @app.route('/payment', methods=['GET','POST'])
 def payment():
+     global payment_id
      if request.method == 'POST':
+        payment_method = request.form['payment']
         try:
+            db.session.add(Payment(payment_id, 1, 50, payment_method))
             db.session.commit()
             return redirect('/payment')
         except:
                return 'There was an issue opening the menu'
      else:
-        return render_template('payment.html')
+        payments = Payment.query.order_by(Payment.payment_id).all()
+        return render_template('payment.html', payments=payments)
 
 if __name__ == '__main__':
      app.run(debug=True)
