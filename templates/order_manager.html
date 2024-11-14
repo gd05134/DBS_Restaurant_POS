@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Order</title>
+{% endblock %}
+ 
+
+{% block body %}
+<div class="content">
+    <form action="/" method="get">
+        <button>Return To Layout</button>
+    </form>
+    <h1 style="text-align: center;">Table {{table.table_id}} - {{table.loc}}</h1>
+    <h4 style="text-align: center;">Capacity: {{table.capacity}}</h4>
+    <div>
+        <div class="form-container">
+            <form action="/menu" method="get">
+                <button class="smalltable">New Order</button>
+            </form>
+            <form action="/menu" method="get">
+                <button class="smalltable">Add To Order</button>
+            </form>
+            <form action="/payment" method="get">
+                <button class="smalltable">Payment</button>
+            </form>
+        </div>
+        <table align="right">
+            <tr>
+            <th>Order No.</th>
+            <th>Name</th>
+            <th>Food</th>
+            <th>Price</th>
+            
+            </tr>
+        
+            <tr> 
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        
+        </table>
+    </div>
+</div>
+{% endblock %}

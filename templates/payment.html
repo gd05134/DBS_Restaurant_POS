@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Payment</title>
+{% endblock %}
+
+
+{% block body %}
+<form onsubmit="window.history.back(); return false;">
+    <button type="submit">Return To Table</button>
+</form>
+<div align="center">
+    <h1>Payment</h1>
+    <select name="payment" id="payment_method">
+        <option value="credit_card">Credit Card</option>
+        <option value="bitcoin">Bitcoin</option>
+        <option value="apple_pay">Apple Pay</option>
+        <option value="cash">Cash</option>
+    </select>
+    <button type="submit">Submit</button>
+</div>
+{% endblock %}

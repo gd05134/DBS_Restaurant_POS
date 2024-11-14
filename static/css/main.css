@@ -24,6 +24,15 @@ h6 {
     border-radius: 25px;
 }
 
+.form-container {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    gap: 20px;                       /* Optional: Space between forms */
+    margin: 20px;
+    flex-wrap: nowrap;
+}
+
 /* .content {
     margin: 0 auto;
     width: 400px;

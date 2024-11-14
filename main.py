@@ -76,12 +76,11 @@ class Payment(db.Model):
     payment_method = db.Column(db.String(20), nullable=False)
     payment_date = db.Column(db.DateTime, default = datetime.today(), nullable=False)
 
-    def __init__(self, payment_id, order_id, amount, payment_method, payment_date):
+    def __init__(self, payment_id, order_id, amount, payment_method):
         self.payment_id = payment_id
         self.order_id = order_id
         self.amount = amount
         self.payment_method = payment_method
-        self.payment_date = payment_date
 
 #MenuCategory Schema
 class MenuCat(db.Model):
@@ -148,24 +147,24 @@ def index():
         try:
             
             db.session.commit()
-            return redirect(url_for('order'))
+            return redirect('/')
         except:
                return 'There was an issue opening the order'
     else:
         return render_template('index.html')
 
 #To enter Order state
-@app.route('/order/<table_id>', methods=['GET','POST'])
+@app.route('/order_manager/<table_id>', methods=['GET','POST'])
 def order(table_id):
      table = Table.query.get_or_404(table_id)
      if request.method == 'POST':
         try:
             db.session.commit()
-            return redirect(url_for('index'))
+            return redirect(url_for('/order_manager/'))
         except:
                return 'There was an issue opening the layout'
      else:
-        return render_template('order.html', table = table)
+        return render_template('order_manager.html', table = table)
 
 #For Customers
 @app.route('/customer', methods=['GET','POST'])
@@ -185,7 +184,6 @@ def add_customer():
         except:
                return 'There was an issue entering your information'
     else:
-        #customers = db.session.execute(db.select(Customer).order_by(Customer.cust_id))
         customers = Customer.query.order_by(Customer.cust_id).all()
         return render_template('customer.html', customers = customers)
 
@@ -208,20 +206,31 @@ def add_reservation():
             except:
                 return 'There was an issue reserving your table'
     else:
-        reservations = Reservation.query.order_by(Reservation.reservation_id).all() #db.session.execute(db.select(Reservation).order_by(Reservation.reservation_id)).all()
+        reservations = Reservation.query.order_by(Reservation.reservation_id).all()
         customers = db.session.query(Customer).join(Reservation, Reservation.cust_id == Customer.cust_id).all()
         return render_template('reservation.html', reservations = reservations, customers = customers)
 
 @app.route('/menu', methods=['GET','POST'])
-def order():
+def menu():
      if request.method == 'POST':
         try:
             db.session.commit()
             return redirect('/menu')
         except:
-               return 'There was an issue opening the layout'
+               return 'There was an issue opening the menu'
      else:
         return render_template('menu.html')
+     
+@app.route('/payment', methods=['GET','POST'])
+def payment():
+     if request.method == 'POST':
+        try:
+            db.session.commit()
+            return redirect('/payment')
+        except:
+               return 'There was an issue opening the menu'
+     else:
+        return render_template('payment.html')
 
 if __name__ == '__main__':
      app.run(debug=True)

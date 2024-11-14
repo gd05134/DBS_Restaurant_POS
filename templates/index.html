@@ -14,7 +14,7 @@
         <button style="position: relative; top: -21px; left: 80px;">Reservations</button>
     </form>
     <h1 style="text-align: center;">Table Layout</h1>
-    <form id="tableLayout" action="/order/" method="get" class="form" align="center">
+    <form id="tableLayout" action="/order_manager/" method="get" class="form" align="center">
         <button id="1" onClick="reply_click(this.id)" class="smalltable"  style="position: relative;top: 0px; left: 325px;">1</button>
         <button id="2" onClick="reply_click(this.id)" class="smalltable" style="position: relative;top: 0px; left: 375px;">2</button>
         <button id="3" onClick="reply_click(this.id)" class="smalltable" style="position: relative;top: 0px; left: 425px;">3</button>
@@ -31,7 +31,7 @@
 <script type="text/javascript">
      function reply_click(clicked_id) {
         const form = document.getElementById("tableLayout");
-        form.action = "/order/" + clicked_id;  // Set the table ID as part of the action URL
+        form.action = "/order_manager/" + clicked_id;  // Set the table ID as part of the action URL
         form.submit(); // Submit the form with the updated action URL
         event.preventDefault(); // Prevent the default form action
     }
