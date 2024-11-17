@@ -23,9 +23,9 @@ function addToOrder(item) {
     if (orderItems[item.name]) {
         currentQuantity = orderItems[item.name].quantity;
         newQuantity = currentQuantity + 1;
-        orderItems[item.name] = { item: item, item_name: item.name, quantity: newQuantity };
+        orderItems[item.name] = {item: item, item_name: item.name, item_id:item.item_id, quantity: newQuantity};
     } else {
-        orderItems[item.name] = { item: item, item_name: item.name, quantity: 1 };
+        orderItems[item.name] = {item: item, item_name: item.name, item_id:item.item_id, quantity: 1};
     }
 
     updateOrderList();
@@ -90,9 +90,10 @@ function removeAll(itemName) {
 function submitOrder() {
     const orderData = {
         table_id: tableId,
-        order_items: Object.keys(orderItems).map(itemName => ({
-            item_name: orderItems[itemName].item.item_name,
-            quantity: orderItems[itemName].quantity
+        order_items: Object.keys(orderItems).map(name => ({
+            item_name: orderItems[name].item_name,
+            item_id: orderItems[name].item_id,
+            quantity: orderItems[name].quantity
         })),
         total_cost: orderTotal
     };

@@ -34,9 +34,15 @@
     </div>
 </div>
 
+<script src="{{url_for('static', filename='js/menu.js')}}"></script>
+
+<script>
+    loadItems(1);
+</script>
+
 <script>
     const tableId = {{ table.table_id }};
 </script>
 
-<script src="{{url_for('static', filename='js/menu.js')}}"></script>
+
 {% endblock %}

@@ -16,11 +16,12 @@ app.secret_key ='key'
 
 #Initialize Relationship Schema
 #Order Schema
-class Order(db.Model):                                                              # GAD - Removed cust_id from Orders
-    order_id = db.Column(db.Integer, primary_key=True, autoincrement=True)                                #Add Auto Increment     
+class Order(db.Model):                                                              #* GAD - Removed cust_id from Orders
+    order_id = db.Column(db.Integer, primary_key=True, autoincrement=True)          #* GAD - Added auto-increment     
     table_id = db.Column(db.Integer, db.ForeignKey("table.table_id"))                                                  
-    order_time = db.Column(db.DateTime, default = datetime.today(), nullable=False)   #idk if this is the right datetime function, will change later
-    total_cost = db.Column(db.Integer, nullable=False)                                #add logic for incrementing later, change to decimal
+    order_time = db.Column(db.DateTime, default = datetime.now(), nullable=False)
+    total_cost = db.Column(db.Float, nullable=False)                              #add logic for incrementing later  #? Is this still needed?
+                                                                                  #* GAD - Changed to float
 
     def __init__(self, table_id, order_time, total_cost):
         self.table_id = table_id
@@ -29,15 +30,15 @@ class Order(db.Model):                                                          
 
 #Customer Schema
 class Customer(db.Model):
-    cust_id = db.Column(db.Integer, primary_key=True)                                 #Add Auto Increment
+    cust_id = db.Column(db.Integer, primary_key=True, autoincrement=True)       #* GAD - Added auto-increment
     cust_first_name = db.Column(db.String(50), nullable=False)                  
     cust_last_name = db.Column(db.String(50), nullable=False)
     phone_no = db.Column(db.String(10), unique=True, nullable=False)                               
     email = db.Column(db.String(60), unique=True, nullable=False)                                
     pref_table = db.Column(db.Integer, db.ForeignKey("table.table_id"))               
 
-    def __init__(self, cust_id, cust_first_name, cust_last_name, phone_no, email, pref_table):
-        self.cust_id = cust_id
+    def __init__(self, cust_first_name, cust_last_name, phone_no, email, pref_table):
+        #self.cust_id = cust_id                                                 #* GAD - Removed auto-incrementing ID from __init__
         self.cust_first_name = cust_first_name
         self.cust_last_name = cust_last_name
         self.phone_no = phone_no
@@ -46,7 +47,7 @@ class Customer(db.Model):
 
 #Table Schema
 class Table(db.Model):
-    table_id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)                                  
+    table_id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False, )                                  
     capacity = db.Column(db.Integer, nullable=False)                                 
     loc = db.Column(db.String(20))
     
@@ -57,36 +58,36 @@ class Table(db.Model):
 
 #Reservation Schema
 class Reservation(db.Model):
-    reservation_id = db.Column(db.Integer, unique=True, primary_key=True)                          #Add auto increment
+    reservation_id = db.Column(db.Integer, unique=True, primary_key=True, autoincrement=True)     #* GAD - Added auto-increment
     cust_id = db.Column(db.Integer, db.ForeignKey("customer.cust_id"), nullable=False)                        
-    date_created = db.Column(db.DateTime, default = datetime.today(), nullable=False) #idk if this is the right datetime function, will change later
-    date_reserved = db.Column(db.DateTime, default = datetime.today(), nullable=False)#pulls current time, find function to pull select time
+    date_created = db.Column(db.DateTime, default = datetime.now(), nullable=False) 
+    date_reserved = db.Column(db.DateTime, default = datetime.now(), nullable=False)              #todo: pulls current time, find function to pull select time
 
-    def __init__(self, reservation_id, cust_id):
-        self.reservation_id = reservation_id
+    def __init__(self, cust_id):
+        #self.reservation_id = reservation_id                                           #* GAD - Removed auto-incrementing ID from __init__
         self.cust_id = cust_id
 
 #Payment Schema
 class Payment(db.Model):
-    payment_id = db.Column(db.Integer, primary_key=True, nullable=False)              #Add auto increment
+    payment_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)    #* GAD - Added auto-increment
     order_id = db.Column(db.Integer,db.ForeignKey("order.order_id"), nullable=False)                                 
-    amount = db.Column(db.Integer, nullable=False)                                    #Change to decimal
+    amount = db.Column(db.Float, nullable=False)                                                #* GAD - Changed to Float
     payment_method = db.Column(db.String(20), nullable=False)
     payment_date = db.Column(db.DateTime, default = datetime.today(), nullable=False)
 
-    def __init__(self, payment_id, order_id, amount, payment_method):
-        self.payment_id = payment_id
+    def __init__(self, order_id, amount, payment_method):
+        #self.payment_id = payment_id                                                           #* GAD - Removed auto-incrementing ID from __init__
         self.order_id = order_id
         self.amount = amount
         self.payment_method = payment_method
 
 #MenuCategory Schema
 class MenuCat(db.Model):
-    category_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)    # GAD - Added autoincrement = True
+    category_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)    #* GAD - Added auto-increment
     name = db.Column(db.String(30), unique=True, nullable=False)                                  
 
     def __init__(self, name):
-        #self.category_id = category_id
+        #self.category_id = category_id                                                          #* GAD - Removed auto-incrementing ID from __init__
         self.name = name
     
     def __repr__(self):
@@ -94,26 +95,29 @@ class MenuCat(db.Model):
 
 #MenuItem Schema
 class MenuItem(db.Model): 
-    menu_item_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)   # GAD - Added autoincrement = True
-    category_id = db.Column(db.Integer, db.ForeignKey("menu_cat.category_id"), nullable=False)                               
-    name = db.Column(db.String(50), unique=True, nullable=False)                    # GAD - Removed "Description"
-    price = db.Column(db.Float, nullable=False)                                     # GAD - Changed to Float (decimal)
+    menu_item_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)   #* GAD - Added auto-increment
+    category_id = db.Column(db.Integer, db.ForeignKey("menu_cat.category_id"), nullable=False)
+    name = db.Column(db.String(50), unique=True, nullable=False)                                #* GAD - Removed "Description"
+    price = db.Column(db.Float, nullable=False)                                                 #* GAD - Changed to Float
 
     def __init__(self, category_id, name, price):
+        #self.menu_item_id = menu_item_id                                                       #* GAD - Removed auto-incrementing ID from __init__
         self.category_id = category_id
         self.name = name
         self.price = price
         
 #OrderItem Schema
 class OrderItem(db.Model):
-    order_item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)        # GAD - Added autoincrement = True
-    order_id = db.Column(db.Integer,db.ForeignKey("order.order_id"), nullable=False)                              
+    order_item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)        #* GAD - Added auto-increment
+    order_id = db.Column(db.Integer,db.ForeignKey("order.order_id"), nullable=False)
+    order = db.relationship('Order', backref='order_items')                            #* GAD - Added Database Relationship
+    menu_item = db.relationship('MenuItem', backref='order_items')                     #* GAD - Added Database Relationship
     menu_item_id = db.Column(db.Integer,db.ForeignKey("menu_item.menu_item_id"), nullable=False)                         
     quantity = db.Column(db.Integer, nullable=False)
     special_instructions = db.Column(db.String(100))
 
-    def __init__(self, order_item_id, order_id, menu_item_id, quantity, special_instructions):
-        self.order_item_id = order_item_id
+    def __init__(self, order_id, menu_item_id, quantity, special_instructions):
+        #self.order_item_id = order_item_id                                            #* GAD - Removed auto-incrementing ID from __init__
         self.order_id = order_id
         self.menu_item_id = menu_item_id
         self.quantity = quantity
@@ -133,8 +137,11 @@ def index():
     else:
         return render_template('index.html')
 
+
+
+
 #To enter Order state
-@app.route('/order_manager/<table_id>', methods=['GET', 'POST'])
+@app.route('/order_manager/<int:table_id>', methods=['GET', 'POST'])
 def order(table_id):
      table = Table.query.get_or_404(table_id)
      if request.method == 'POST':
@@ -143,8 +150,38 @@ def order(table_id):
             return redirect(url_for('/order_manager/'))
         except:
                return 'There was an issue opening the layout'
-     else:
-        return render_template('order_manager.html', table = table)
+     else:                 
+        orders = (
+            db.session.query(
+                Order.order_id,
+                Order.order_time,
+                Order.total_cost,
+                db.func.group_concat(MenuItem.name, ", ").label("food_items"),
+                db.func.group_concat(OrderItem.quantity, ", ").label("food_quantities")
+            )
+            .join(OrderItem, Order.order_id == OrderItem.order_id)
+            .join(MenuItem, OrderItem.menu_item_id == MenuItem.menu_item_id)
+            .filter(Order.table_id == table_id)
+            .group_by(Order.order_id)
+            .order_by(Order.order_time)
+            .all()
+        )
+        
+        processed_orders = []
+        for order in orders:
+            food_item_list = (order.food_items).split(',')
+            food_quantities_list = (order.food_quantities).replace(' ','').split(',')
+            food_items = []
+            for i in range(0, len(food_item_list)):
+                food_items.append(f"{food_item_list[i]} (x{food_quantities_list[i]})")
+            processed_orders.append({
+                'order_id': order.order_id,
+                'order_time': (order.order_time).strftime("%m/%d/%Y %H:%M:%S"),
+                'food_list': '\n'.join(food_items),
+                'total_cost': order.total_cost
+            })
+        
+        return render_template('order_manager.html', table = table, orders = processed_orders)
 
 #For Customers
 @app.route('/customer', methods=['GET','POST'])
@@ -164,6 +201,7 @@ def add_customer():
         except:
                return 'There was an issue entering your information'
     else:
+        
         customers = Customer.query.order_by(Customer.cust_id).all()
         return render_template('customer.html', customers = customers)
 
@@ -206,7 +244,7 @@ def menu():
 @app.route('/menu_items/<int:category_id>') # GAD
 def menu_items(category_id):
     items = MenuItem.query.filter_by(category_id=category_id).all()
-    items_data = [{'name': item.name, 'price': item.price} for item in items]
+    items_data = [{'name': item.name, 'price': item.price, 'item_id':item.menu_item_id} for item in items]
     return jsonify(items_data)
      
 @app.route('/payment', methods=['GET','POST'])
@@ -237,9 +275,7 @@ def submit_order():
 
     # Add order items
     for item in order_items:
-        print(f"item: {item}") #! DEBUG Im gonna blow my brains out I swear to god
-        #! Why can this single piece of shit line not see item['item_name'] wherwe am i MISSING IT???????
-        order_item = OrderItem(order_id=new_order.order_id, item_name=item['item_name'], 
+        order_item = OrderItem(order_id=new_order.order_id, menu_item_id=item["item_id"], 
                                quantity=item['quantity'], special_instructions="")
         db.session.add(order_item)
 
