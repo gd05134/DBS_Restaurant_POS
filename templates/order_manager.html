@@ -13,14 +13,14 @@
     <h1 style="text-align: center;">Table {{table.table_id}} - {{table.loc}}</h1>
     <h4 style="text-align: center;">Capacity: {{table.capacity}}</h4>
     <div>
-        <div class="form-container">
+        <div class="form-container" align="center">
             <form action="/menu" method="get">
                 <button class="smalltable">New Order</button>
             </form>
             <form action="/menu" method="get">
                 <button class="smalltable">Add To Order</button>
             </form>
-            <form action="/payment" method="get">
+            <form id="payment_button" action="/payment" method="get" onClick="create_url()">
                 <button class="smalltable">Payment</button>
             </form>
         </div>
@@ -45,4 +45,14 @@
         </table>
     </div>
 </div>
+
+<script type="text/javascript">
+    function create_url() {
+       table_id = sessionStorage.getItem('tableID');
+       const form = document.getElementById("payment_button");
+       form.action = "/payment/" + table_id;  // Set the table ID as part of the action URL
+       form.submit(); // Submit the form with the updated action URL
+       event.preventDefault(); // Prevent the default form action
+   }
+</script>
 {% endblock %}

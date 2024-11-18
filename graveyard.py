@@ -15,7 +15,7 @@
     db.session.commit()'''
 
 # Adding Menu Items (Run Once - Done)
-'''with app.app_context():
+'''=with app.app_context():
     # Clear
     db.session.query(MenuCat).delete()
     db.session.query(MenuItem).delete()

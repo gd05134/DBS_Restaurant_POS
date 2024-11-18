@@ -1,5 +1,6 @@
 let orderTotal = 0;
 let orderItems = {};
+const tableID = sessionStorage.getItem('tableID');
 
 function loadItems(categoryId) {
     fetch(`/menu_items/${categoryId}`)
@@ -89,7 +90,7 @@ function removeAll(itemName) {
 
 function submitOrder() {
     const orderData = {
-        table_id: tableId,
+        table_id: tableID,
         order_items: Object.keys(orderItems).map(name => ({
             item_name: orderItems[name].item_name,
             item_id: orderItems[name].item_id,
@@ -97,6 +98,7 @@ function submitOrder() {
         })),
         total_cost: orderTotal
     };
+    console.log(tableID);
 
     fetch('/submit_order', {
         method: 'POST',

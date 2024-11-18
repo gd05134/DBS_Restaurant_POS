@@ -7,11 +7,8 @@
 
 {% block body %}
 <div class="content">
-    <form action="/customer" method="get">
-        <button style="position: relative; top: 0px; left: 0px;">Customers</button>
-    </form>
-    <form action="/reservation" method="get">
-        <button style="position: relative; top: -21px; left: 80px;">Reservations</button>
+    <form action="/reservation_manager" method="get">
+        <button style="position: relative; top: 0px; left: 0px;">Reservations</button>
     </form>
     <h1 style="text-align: center;">Table Layout</h1>
     <form id="tableLayout" action="/order_manager/" method="get" class="form" align="center">
@@ -34,6 +31,7 @@
         form.action = "/order_manager/" + clicked_id;  // Set the table ID as part of the action URL
         form.submit(); // Submit the form with the updated action URL
         event.preventDefault(); // Prevent the default form action
+        sessionStorage.setItem('tableID', clicked_id);
     }
 </script>
 {% endblock %}

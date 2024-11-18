@@ -5,13 +5,25 @@ body, html {
     color: white;
 }
 
-h1 {
-    margin: 5px;
+.display-container {
+    background-color: white;
+    color: black;
+    display: flex;
+    border-collapse: collapse;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    flex-direction: column;
+    width: 70%;
+    table-layout: auto;
+    margin-left: auto;
 }
 
-h6 {
-    margin: 5px;
-}
+/* table li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+} */
 
 .smalltable {
     height: 150px;
@@ -25,11 +37,11 @@ h6 {
 }
 
 .form-container {
-    align-items: center;
-    justify-content: center;
     display: flex;
-    gap: 20px;                       /* Optional: Space between forms */
-    margin: 20px;
+    align-items: left;
+    justify-content: left;
+    gap: 5px;                       /* Optional: Space between forms */
+    margin: 5px;
     flex-wrap: nowrap;
 }
 
@@ -38,33 +50,7 @@ h6 {
     width: 400px;
 } */
 
-table, td, th {
-    border: 1px solid #aaa;
-}
-
-.table {
-    border-collapse: collapse;
-    flex: 1 1 auto;
-    display: flex;
-    overflow-y: auto;
-    flex-direction: column;
-    width: 70%;
-    table-layout: fixed;
-}
-
-th {
-    height: 30px;
-}
-
-/* td {
-    padding: 5px;
-} */
-
-.form {
+form {
     align-self: center;
     margin-top: 20px;
 }
-
-/* #content {
-    width: 70%;
-} */

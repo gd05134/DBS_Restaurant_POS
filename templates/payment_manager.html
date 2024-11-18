@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Payment</title>
+{% endblock %}
+
+
+{% block body %}
+<form action="/">
+    <button type="submit">Return To Layout</button>
+</form>
+<div align="center">
+    <h1>Payment</h1>
+    <form id="payment_manager" action="/payment/{{table_id}}" method ="post">
+        <input type="hidden" name="table_id" value="{{ table_id }}">
+        <h4>Order No. and Payment Method</h4>
+        <input type="text" name="order_no">
+        <select name="payment_manager" id="payment_manager">
+            <option value="credit_card">Credit Card</option>
+            <option value="bitcoin">Bitcoin</option>
+            <option value="apple_pay">Apple Pay</option>
+            <option value="cash">Cash</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+    <table class="table">
+        <tr>
+            <th>Order No.</th>
+            <th>Amount</th>
+            <th>Method</th>
+        </tr>
+        {% for payment in payments %}
+        <tr> 
+            <td>{{payment.order_id}}</td>
+            <td>{{payment.price}}</td>
+            <td>{{payment.payment_method}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+<table class="table">
+    <tr>
+        <th>Order No.</th>
+        <th>Order Time</th>
+        <th>Food</th>
+        <th>Price</th>
+    </tr>
+    {% for order in orders_at_table[::-1] %}
+    <tr> 
+        <td>{{order.order_id}}</td>
+        <td>{{order.order_time}}</td>
+        <td>{{order.food_list}}</td>
+        <td>{{order.price}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

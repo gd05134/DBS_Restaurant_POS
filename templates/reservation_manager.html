@@ -1,17 +1,41 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>Customers</title>
+<title>Reservations</title>
+<link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
 {% endblock %}
  
 {% block body %}
-<div class="content">
+<div>
     <form action="/" method="GET">
         <button>Return to Layout</button>
     </form>
-    <h1 style="text-align: center;">Customer Manager</h1>
+    <h1 style="text-align: center;">Reservation Manager</h1>
+    <!-- <table style="margin-left: auto;">
+        <tr>
+          <th>Customer Name</th>
+          <th>Contact Info</th>
+          <th>Date</th>
+        </tr>
+        {% for customer in reservations %}
+        <tr> 
+          <td>{{customer.cust_first_name}} {{customer.cust_last_name}}</td>
+          <td>{{customer.phone_no}}, {{customer.email}}</td>
+          <td></td>
+          
+        </tr>
+        {% endfor %}
+    </table>
     <div class="form">
-        <form action="/customer" method="POST" align="center">
+        <form action="/reservation" method="POST">
+            <h5>Add Reservation</h5>
+            <h6>Enter Customer ID</h6>
+            <input type="text" name="Enter Customer ID" id="enter_customer_id">
+            <input type="submit" name="Enter Info">
+        </form>
+    </div> -->
+    <div class="form-container">
+        <form action="/reservation_manager" method="POST">
             <h5>Add Customer</h5>
             <h6>First Name</h6>
             <input type="text" name="First Name" id="first_name">
@@ -26,12 +50,13 @@
             <input type="submit" name="Enter Info">
         </form>
     </div>
-    <table class="table">
+    <table class="reservation-display">
         <tr>
           <th>ID</th>
           <th>Name</th>
-          <th>Contact</th>
+          <th>Contact Info</th>
           <th>Preferred Table</th>
+          <th>Date Reserved</th>
         </tr>
         {% for customer in customers %}
         <tr> 
@@ -39,6 +64,7 @@
           <td>{{customer.cust_last_name}}, {{customer.cust_first_name}}</td>
           <td>{{customer.phone_no}}, {{customer.email}}</td>
           <td>{{customer.pref_table}}</td>
+          <td>{{customer.date_reserved}}</td>
         </tr>
         {% endfor %}
     </table>

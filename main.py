@@ -4,9 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 #global variables if needed
-customer_id = 0
-res_id = 0
-payment_id = 0
 
 #Create Flask App
 app = Flask(__name__)
@@ -35,7 +32,9 @@ class Customer(db.Model):
     cust_last_name = db.Column(db.String(50), nullable=False)
     phone_no = db.Column(db.String(10), unique=True, nullable=False)                               
     email = db.Column(db.String(60), unique=True, nullable=False)                                
-    pref_table = db.Column(db.Integer, db.ForeignKey("table.table_id"))               
+    pref_table = db.Column(db.Integer, db.ForeignKey("table.table_id")) 
+    date_created = db.Column(db.DateTime, default = datetime.now(), nullable=False) 
+    date_reserved = db.Column(db.DateTime, default = datetime.now(), nullable=False)             
 
     def __init__(self, cust_first_name, cust_last_name, phone_no, email, pref_table):
         #self.cust_id = cust_id                                                 #* GAD - Removed auto-incrementing ID from __init__
@@ -47,7 +46,7 @@ class Customer(db.Model):
 
 #Table Schema
 class Table(db.Model):
-    table_id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False, )                                  
+    table_id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)                                  
     capacity = db.Column(db.Integer, nullable=False)                                 
     loc = db.Column(db.String(20))
     
@@ -56,16 +55,16 @@ class Table(db.Model):
         self.capacity = capacity
         self.loc = loc
 
-#Reservation Schema
-class Reservation(db.Model):
-    reservation_id = db.Column(db.Integer, unique=True, primary_key=True, autoincrement=True)     #* GAD - Added auto-increment
-    cust_id = db.Column(db.Integer, db.ForeignKey("customer.cust_id"), nullable=False)                        
-    date_created = db.Column(db.DateTime, default = datetime.now(), nullable=False) 
-    date_reserved = db.Column(db.DateTime, default = datetime.now(), nullable=False)              #todo: pulls current time, find function to pull select time
+#Reservation Schema                                                                                #! REMOVED RESERVATION TABLE
+# class Reservation(db.Model):
+#     reservation_id = db.Column(db.Integer, unique=True, primary_key=True, autoincrement=True)     #* GAD - Added auto-increment
+#     cust_id = db.Column(db.Integer, db.ForeignKey("customer.cust_id"), nullable=False)                        
+#     date_created = db.Column(db.DateTime, default = datetime.now(), nullable=False) 
+#     date_reserved = db.Column(db.DateTime, default = datetime.now(), nullable=False)              #todo: pulls current time, find function to pull select time
 
-    def __init__(self, cust_id):
-        #self.reservation_id = reservation_id                                           #* GAD - Removed auto-incrementing ID from __init__
-        self.cust_id = cust_id
+#     def __init__(self, cust_id):
+#         #self.reservation_id = reservation_id                                           #* GAD - Removed auto-incrementing ID from __init__
+#         self.cust_id = cust_id
 
 #Payment Schema
 class Payment(db.Model):
@@ -123,7 +122,6 @@ class OrderItem(db.Model):
         self.quantity = quantity
         self.special_instructions = special_instructions
 
-
 #Main Restaurant Layout
 @app.route('/', methods=['GET','POST'])
 def index():
@@ -136,9 +134,6 @@ def index():
                return 'There was an issue opening the order'
     else:
         return render_template('index.html')
-
-
-
 
 #To enter Order state
 @app.route('/order_manager/<int:table_id>', methods=['GET', 'POST'])
@@ -183,10 +178,9 @@ def order(table_id):
         
         return render_template('order_manager.html', table = table, orders = processed_orders)
 
-#For Customers
-@app.route('/customer', methods=['GET','POST'])
-def add_customer():
-    global customer_id 
+#For reservations
+@app.route('/reservation_manager', methods=['GET','POST'])
+def add_reservation():
     if request.method == 'POST':
         cust_first_name = request.form['First Name']
         cust_last_name = request.form['Last Name']
@@ -194,39 +188,19 @@ def add_customer():
         email = request.form['Email']
         pref_table = request.form['Preferred Table']
         try:
-            db.session.add(Customer(customer_id, cust_first_name, cust_last_name, phone_no, email, pref_table))
-            customer_id += 1
+            db.session.add(Customer(cust_first_name, 
+                                    cust_last_name, 
+                                    phone_no, email, 
+                                    pref_table))
             db.session.commit()
-            return redirect('/customer')
+            return redirect('/reservation_manager')
         except:
-               return 'There was an issue entering your information'
+            return 'There was an issue reserving your table'
     else:
-        
+        # reservations = Reservation.query.order_by(Reservation.reservation_id).all()
         customers = Customer.query.order_by(Customer.cust_id).all()
-        return render_template('customer.html', customers = customers)
-
-#For reservations
-@app.route('/reservation', methods=['GET','POST'])
-def add_reservation():
-    global res_id
-    if request.method == 'POST':
-        cust_id = request.form['Enter Customer ID']
-        existing_reservation = Reservation.query.filter_by(cust_id=cust_id).first()
-    
-        if existing_reservation:
-            return redirect('/reservation')
-        else:
-            try:
-                db.session.add(Reservation(res_id, cust_id))
-                res_id += 1
-                db.session.commit()
-                return redirect('/reservation')
-            except:
-                return 'There was an issue reserving your table'
-    else:
-        reservations = Reservation.query.order_by(Reservation.reservation_id).all()
-        customers = db.session.query(Customer).join(Reservation, Reservation.cust_id == Customer.cust_id).all()
-        return render_template('reservation.html', reservations = reservations, customers = customers)
+        # customers = db.session.query(Customer).join(Reservation, Reservation.cust_id == Customer.cust_id).all()
+        return render_template('reservation_manager.html', customers = customers)
 
 @app.route('/menu', methods=['GET', 'POST']) # GAD
 def menu():
@@ -247,20 +221,28 @@ def menu_items(category_id):
     items_data = [{'name': item.name, 'price': item.price, 'item_id':item.menu_item_id} for item in items]
     return jsonify(items_data)
      
-@app.route('/payment', methods=['GET','POST'])
-def payment():
-     global payment_id
+@app.route('/payment/<int:table_id>', methods=['GET','POST'])
+def payment(table_id):
+     print(f"Which Table: { table_id }")
      if request.method == 'POST':
-        payment_method = request.form['payment']
+        order_id = request.form['order_no']
+        payment_method = request.form['payment_manager']
         try:
-            db.session.add(Payment(payment_id, 1, 50, payment_method))
+            print(f"payment method: {payment_method}")
+            db.session.add(Payment(order_id, 50, payment_method))
+            # db.session.delete(Order.order_id == order_id)
             db.session.commit()
-            return redirect('/payment')
+            return redirect('/payment_manager')
         except:
                return 'There was an issue opening the menu'
      else:
+        orders_at_table = db.session.query(Order).join(Table, Order.table_id == table_id).all()
+        for order in orders_at_table:
+            print(f"Order ID, Table ID: {order.order_id}, {order.table_id}")
         payments = Payment.query.order_by(Payment.payment_id).all()
-        return render_template('payment.html', payments=payments)
+        return render_template('payment_manager.html', 
+                               payments = payments, 
+                               orders_at_table = orders_at_table)
     
 @app.route('/submit_order', methods=['POST']) # GAD
 def submit_order():
