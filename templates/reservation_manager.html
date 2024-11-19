@@ -11,30 +11,8 @@
         <button>Return to Layout</button>
     </form>
     <h1 style="text-align: center;">Reservation Manager</h1>
-    <!-- <table style="margin-left: auto;">
-        <tr>
-          <th>Customer Name</th>
-          <th>Contact Info</th>
-          <th>Date</th>
-        </tr>
-        {% for customer in reservations %}
-        <tr> 
-          <td>{{customer.cust_first_name}} {{customer.cust_last_name}}</td>
-          <td>{{customer.phone_no}}, {{customer.email}}</td>
-          <td></td>
-          
-        </tr>
-        {% endfor %}
-    </table>
-    <div class="form">
-        <form action="/reservation" method="POST">
-            <h5>Add Reservation</h5>
-            <h6>Enter Customer ID</h6>
-            <input type="text" name="Enter Customer ID" id="enter_customer_id">
-            <input type="submit" name="Enter Info">
-        </form>
-    </div> -->
-    <div class="form-container">
+    <div class="container">
+    <div class="form-container-non-centered">
         <form action="/reservation_manager" method="POST">
             <h5>Add Customer</h5>
             <h6>First Name</h6>
@@ -50,7 +28,49 @@
             <input type="submit" name="Enter Info">
         </form>
     </div>
-    <table class="reservation-display">
+
+    <script>
+        function validate_data(event) {
+            event.preventDefault();
+
+            const firstName = document.getElementById("first_name").value.trim();
+            const lastName = document.getElementById("last_name").value.trim();
+            const phoneNo = document.getElementById("phone_no").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const prefTable = document.getElementById("pref_table").value.trim();
+            const errors = [];
+    
+            if (firstName.length === 0 || firstName.length > 50) {
+                errors.push("First Name must be between 1 and 50 characters.");
+            }
+
+            if (lastName.length === 0 || lastName.length > 50) {
+                errors.push("Last Name must be between 1 and 50 characters.");
+            }
+
+            if (!/^\d{10}$/.test(phoneNo)) {
+                errors.push("Phone Number must be exactly 10 digits.");
+            }
+
+            if (email.length > 50) {
+                errors.push("Email must be fewer than 50 characters.");
+            }
+
+            if (prefTable !== "" && (!/^\d+$/.test(prefTable) || prefTable < 1 || prefTable > 10)) {
+                errors.push("Preferred Table must be a number between 1 and 10 or left empty.");
+            }
+
+            if (errors.length > 0) {
+                alert("Error:\n"+errors.join("\n"));
+            } else {
+                event.target.submit();
+            }
+        }
+
+        document.querySelector("form[action='/reservation_manager']").addEventListener("submit", validate_data);
+    </script>
+
+    <table class="table">
         <tr>
           <th>ID</th>
           <th>Name</th>
@@ -64,9 +84,11 @@
           <td>{{customer.cust_last_name}}, {{customer.cust_first_name}}</td>
           <td>{{customer.phone_no}}, {{customer.email}}</td>
           <td>{{customer.pref_table}}</td>
-          <td>{{customer.date_reserved}}</td>
+          <td>{{customer.date_reserved.strftime("%a, %b %d - %H:%M %p")}}</td>
         </tr>
         {% endfor %}
     </table>
+    </div>
 </div>
+
 {% endblock %}

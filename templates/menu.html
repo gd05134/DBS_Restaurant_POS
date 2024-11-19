@@ -15,7 +15,7 @@
         <h3>Current Order</h3>
         <ul id="orderList"></ul>
         <p>Order Total: $<span id="orderTotal">0.00</span></p>
-        <button onclick="submitOrder()">Submit Order</button>
+        <button type="submit" onclick="submitOrder()">Submit Order</button>
     </div>
 
     <div class="right-container">
@@ -45,18 +45,6 @@
 
     loadItems(1);
 </script>
-
-
-<ul id="orderList">
-    {% if order_items %}
-        {% for item in order_items %}
-            <li class="order-item">
-                <span>{{ item.name }} - ${{ item.price }} (x{{ item.quantity }})</span>
-                <button onclick="removeFromOrder('{{ item.name }}')">X</button>
-            </li>
-        {% endfor %}
-    {% endif %}
-</ul>
 
 
 <script>

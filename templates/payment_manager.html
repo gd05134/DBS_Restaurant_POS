@@ -2,18 +2,41 @@
 
 {% block head %}
 <title>Payment</title>
+<link rel="stylesheet" href="{{url_for('static', filename='css/menu_style.css')}}">
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const flashMessages = {{ get_flashed_messages(category_filter=["error"])|tojson }};
+        flashMessages.forEach(msg => alert(msg));
+    });
+</script>
 {% endblock %}
 
 
 {% block body %}
+<script type="text/javascript">
+    const table_id = sessionStorage.getItem('tableID');
+</script>
 <form action="/">
     <button type="submit">Return To Layout</button>
 </form>
-<div align="center">
-    <h1>Payment</h1>
+<h1 align="center">Table {{table_id}} - Payment</h1>
+<div class="container">
+    <table class="table">
+        <tr>
+            <th>Order No.</th>
+            <th>Price</th>
+            <th>Order Time</th>
+        </tr>
+        {% for order in orders_at_table[::-1] %}
+        <tr> 
+            <td>{{order.order_id}}</td>
+            <td>${{order.total_cost}}0</td>
+            <td>{{order.order_time.strftime("%a, %b %d - %H:%M %p")}}</td>
+        </tr>
+        {% endfor %}
+    </table>
     <form id="payment_manager" action="/payment/{{table_id}}" method ="post">
-        <input type="hidden" name="table_id" value="{{ table_id }}">
-        <h4>Order No. and Payment Method</h4>
+        <h4 align="center">Order No. and Payment Method</h4>
         <input type="text" name="order_no">
         <select name="payment_manager" id="payment_manager">
             <option value="credit_card">Credit Card</option>
@@ -29,29 +52,13 @@
             <th>Amount</th>
             <th>Method</th>
         </tr>
-        {% for payment in payments %}
+        {% for payment in payments[::-1] %}
         <tr> 
             <td>{{payment.order_id}}</td>
-            <td>{{payment.price}}</td>
+            <td>${{payment.amount}}0</td>
             <td>{{payment.payment_method}}</td>
         </tr>
         {% endfor %}
     </table>
 </div>
-<table class="table">
-    <tr>
-        <th>Order No.</th>
-        <th>Order Time</th>
-        <th>Food</th>
-        <th>Price</th>
-    </tr>
-    {% for order in orders_at_table[::-1] %}
-    <tr> 
-        <td>{{order.order_id}}</td>
-        <td>{{order.order_time}}</td>
-        <td>{{order.food_list}}</td>
-        <td>{{order.price}}</td>
-    </tr>
-    {% endfor %}
-</table>
 {% endblock %}

@@ -33,6 +33,7 @@ function loadItems(categoryId) {
                 const itemButton = document.createElement("button");
                 itemButton.textContent = `${item.name} - $${item.price.toFixed(2)}`;
                 itemButton.onclick = () => addToOrder(item);
+                itemButton.classList.add("menu-item-btn");
                 itemsGrid.appendChild(itemButton);
             });
         })

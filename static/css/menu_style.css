@@ -36,22 +36,20 @@
 }
 
 
-
-/* CURRENTLY BROKEN RAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH GAD */
 /* Submit Button */
 .order-queue button[type="submit"] {
     margin-top: 20px;
     padding: 10px;
     width: 100%;
-    background-color: #5d19dd;
-    color: white;
+    background-color: #aca8a0;
+    color: rgb(0, 0, 0);
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
 .order-queue button[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #9b9e8b;
 }
 
 
@@ -84,26 +82,29 @@
     justify-content: center;
     align-items: center;
     word-wrap: break-word; /* Allow text wrapping */
-    background-color: #ddd;
-    border: 1px solid #ccc;
+    background-color: #aca8a0;
+    border: 1px solid #9b9e8b;
     border-radius: 8px;
+}
+
+.category-btn:hover {
+    background-color: #9b9e8b;
 }
 
 .menu-items-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr); /* Create a grid with 4 columns */
+    aspect-ratio: 2.5/1;
     gap: 10px;
 }
 
 .menu-item-btn {
-    width: 100px;
-    height: 100px;
     text-align: center;
     justify-content: center;
     align-items: center;
     word-wrap: break-word;
-    background-color: #f1f1f1;
-    border: 1px solid #ccc;
+    background-color: #ecece9;
+    border: 1px solid #9b9e8b;
     border-radius: 8px;
     cursor: pointer;
     display: flex;
@@ -112,12 +113,16 @@
     padding: 0;
 }
 
+.menu-item-btn:hover {
+    background-color: #e4e4dd;
+}
+
 /* Remove Item Buttons */
 .remove-one-btn {
     width: 30px;
     height: 30px;
     font-size: 12px;
-    background-color: rgb(230, 182, 182);
+    background-color: #e08e81;
     border: 1px solid black;
     box-sizing: border-box;
     display: inline-flex;
@@ -127,14 +132,14 @@
 }
 
 .remove-one-btn:hover {
-    background-color: rgb(153, 102, 102);
+    background-color: #d86857;
 }
 
 .remove-all-btn {
     width: 50px;
     height: 30px;
     font-size: 12px;
-    background-color: rgb(230, 182, 182);
+    background-color: #e08e81;
     border: 1px solid black;
     box-sizing: border-box;
     display: inline-flex;
@@ -144,5 +149,5 @@
 }
 
 .remove-all-btn:hover {
-    background-color: rgb(153, 102, 102);
+    background-color: #d86857;
 }

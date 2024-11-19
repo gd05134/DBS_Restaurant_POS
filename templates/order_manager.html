@@ -10,7 +10,7 @@
     <form action="/" method="get">
         <button>Return To Layout</button>
     </form>
-    <h1 style="text-align: center;">Table {{table.table_id}} - {{table.loc}}</h1>
+    <h1 style="text-align: center;">Table {{table.table_id}} - The Last Drop</h1>
     <h4 style="text-align: center;">Capacity: {{table.capacity}}</h4>
     <div>
         <div class="form-container" align="center">
@@ -41,12 +41,6 @@
                 <td>{{ order.order_time }}</td>
                 <td style="white-space: pre-line;">{{ order.food_list }}</td>
                 <td>${{ "%.2f"|format(order.total_cost) }}</td>
-                <td> 
-                    <form method="GET" action="/menu">
-                        <input type="hidden" name="order_id" value="{{ order.order_id }}">
-                        <button type="submit">Modify Order</button>
-                    </form>
-                </td>
                 <td> 
                     <form method="GET" action="/menu">
                         <input type="hidden" name="order_id" value="{{ order.order_id }}">

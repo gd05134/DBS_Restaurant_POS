@@ -1,47 +1,60 @@
 body, html {
     /* margin: 0; */
     font-family: sans-serif;
-    background-color: black;
-    color: white;
-}
-
-.display-container {
-    background-color: white;
+    background-color: #E3DFD7;
     color: black;
-    display: flex;
-    border-collapse: collapse;
-    flex: 1 1 auto;
-    overflow-y: auto;
-    flex-direction: column;
-    width: 70%;
-    table-layout: auto;
-    margin-left: auto;
 }
 
-/* table li {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px;
-    border-bottom: 1px solid #ccc;
-} */
+h1 {
+    margin: 5px;
+}
+
+h6 {
+    margin: 5px;
+}
 
 .smalltable {
     height: 150px;
     width: 100px;
+    /*background-color: #776f60;*/
+    background-color: #aca8a0
+}
+
+.smalltable:hover {
+    background-color: #9b9e8b
 }
 
 .largetable {
     height: 100px;
     width: 200px;
     border-radius: 25px;
+    /*background-color: #776f60;*/
+    background-color: #aca8a0
+}
+
+.largetable:hover {
+    background-color: #9b9e8b
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    padding: auto;
 }
 
 .form-container {
+    align-items: center;
+    justify-content: center;
     display: flex;
-    align-items: left;
-    justify-content: left;
-    gap: 5px;                       /* Optional: Space between forms */
-    margin: 5px;
+    gap: 20px;                       /* Optional: Space between forms */
+    margin: 20px;
+    flex-wrap: nowrap;
+}
+
+.form-container-non-centered {
+    display: flex;
+    gap: 20px;                       /* Optional: Space between forms */
+    margin: 20px;
     flex-wrap: nowrap;
 }
 
@@ -50,7 +63,29 @@ body, html {
     width: 400px;
 } */
 
-form {
+table, td, th {
+    border: 1px solid #9b9e8b;
+    padding: 8px;
+    text-align: left;
+    word-wrap: break-word;
+}
+
+thead {
+    display: table-header-group;
+}
+
+.table {
+    background-color: #dbdbd5;
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 30%;
+}
+
+.table tr:nth-child(even) {
+    background-color: #ecece9; /* Light grey for odd rows */
+}
+
+.form {
     align-self: center;
     margin-top: 20px;
 }

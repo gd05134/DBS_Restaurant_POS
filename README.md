@@ -1,4 +1,8 @@
 # DBS_Restaurant_POS V0.2
+
+Database Systems Final Project - Restaurant POS System
+Written by Caelin J., Garth D., and Grey M.
+
 In order to install requirements.txt, please run the command;
 pip install -r requirements.txt
 
