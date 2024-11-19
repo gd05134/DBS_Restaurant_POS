@@ -18,16 +18,13 @@
         <button onclick="submitOrder()">Submit Order</button>
     </div>
 
-    <!-- Right container for Categories and Menu Items -->
     <div class="right-container">
-        <!-- Categories row at the top -->
         <div class="category-row">
             {% for category in categories %}
                 <button class="category-btn" onclick="loadItems({{category.category_id}})">{{category.name}}</button>
             {% endfor %}
         </div>
 
-        <!-- Menu Items Grid below Categories -->
         <div class="menu-items-grid" id="itemsGrid">
             <!-- Menu items will populate here depending on the selected category -->
         </div>
@@ -37,8 +34,30 @@
 <script src="{{url_for('static', filename='js/menu.js')}}"></script>
 
 <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const order_id = urlParams.has('order_id') ? urlParams.get('order_id') : null;
+
+    if (order_id) {
+        getPreviousOrderItems(order_id);
+    } else {
+        getPreviousOrderItems(null);
+    }
+
     loadItems(1);
 </script>
+
+
+<ul id="orderList">
+    {% if order_items %}
+        {% for item in order_items %}
+            <li class="order-item">
+                <span>{{ item.name }} - ${{ item.price }} (x{{ item.quantity }})</span>
+                <button onclick="removeFromOrder('{{ item.name }}')">X</button>
+            </li>
+        {% endfor %}
+    {% endif %}
+</ul>
+
 
 <script>
     const tableId = {{ table.table_id }};

@@ -2,6 +2,27 @@ let orderTotal = 0;
 let orderItems = {};
 const tableID = sessionStorage.getItem('tableID');
 
+function getPreviousOrderItems(order_id) {
+    if (order_id != null) {
+        fetch(`/get_order_items/${order_id}`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(item => {
+                    orderItems[item.name] = {
+                        item: item,
+                        item_name: item.name,
+                        item_id: item.item_id,
+                        quantity: item.quantity
+                    };
+                });
+                updateOrderList();
+            })
+            .catch(error => {
+                console.error("Error fetching previous order items:", error);
+            });
+    }
+}
+
 function loadItems(categoryId) {
     fetch(`/menu_items/${categoryId}`)
         .then(response => response.json())
@@ -89,6 +110,7 @@ function removeAll(itemName) {
 
 
 function submitOrder() {
+    const order_id = new URLSearchParams(window.location.search).get('order_id');
     const orderData = {
         table_id: tableID,
         order_items: Object.keys(orderItems).map(name => ({
@@ -98,7 +120,10 @@ function submitOrder() {
         })),
         total_cost: orderTotal
     };
-    console.log(tableID);
+    
+    if (order_id) {
+        orderData.order_id = order_id;
+    }
 
     fetch('/submit_order', {
         method: 'POST',

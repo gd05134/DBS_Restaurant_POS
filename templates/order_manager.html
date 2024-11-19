@@ -30,7 +30,7 @@
             <th>Order Time</th>
             <th>Food</th>
             <th>Price</th>
-            
+            <th>Modify?</th>
             </tr>
         
             {% for order in orders[::-1] %} <!-- The [::-1] reverses the orders such that newest is on top. -->
@@ -39,6 +39,12 @@
                 <td>{{ order.order_time }}</td>
                 <td style="white-space: pre-line;">{{ order.food_list }}</td>
                 <td>${{ "%.2f"|format(order.total_cost) }}</td>
+                <td> 
+                    <form method="GET" action="/menu">
+                        <input type="hidden" name="order_id" value="{{ order.order_id }}">
+                        <button type="submit">Modify Order</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         
