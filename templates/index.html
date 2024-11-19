@@ -2,6 +2,8 @@
 
 {% block head %}
 <title>Restaurant</title>
+<link rel="shortcut icon" href="/favicon.ico?" type="image/x-icon">
+<link rel="icon" href="/favicon.ico?" type="image/x-icon">
 {% endblock %}
  
 
@@ -28,9 +30,9 @@
 <script type="text/javascript">
      function reply_click(clicked_id) {
         const form = document.getElementById("tableLayout");
-        form.action = "/order_manager/" + clicked_id;  // Set the table ID as part of the action URL
-        form.submit(); // Submit the form with the updated action URL
-        event.preventDefault(); // Prevent the default form action
+        form.action = "/order_manager/" + clicked_id;
+        form.submit();
+        event.preventDefault();
         sessionStorage.setItem('tableID', clicked_id);
     }
 </script>
