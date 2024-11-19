@@ -20,6 +20,12 @@ class Order(db.Model):                                                          
     total_cost = db.Column(db.Float, nullable=False)                              #add logic for incrementing later  #? Is this still needed?
                                                                                   #* GAD - Changed to float
 
+    order_items = db.relationship(
+        'OrderItem',
+        cascade="all, delete-orphan",
+        backref='order'
+    )
+
     def __init__(self, table_id, order_time, total_cost):
         self.table_id = table_id
         self.order_time = order_time
@@ -109,12 +115,15 @@ class MenuItem(db.Model):
 class OrderItem(db.Model):
     order_item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)        #* GAD - Added auto-increment
     order_id = db.Column(db.Integer,db.ForeignKey("order.order_id"), nullable=False)
-    order = db.relationship('Order', backref='order_items')                            #* GAD - Added Database Relationship
-    menu_item = db.relationship('MenuItem', backref='order_items')                     #* GAD - Added Database Relationship
+    # order = db.relationship('Order', backref='order_items')                            #! MOVED TO ORDER CBJ
     menu_item_id = db.Column(db.Integer,db.ForeignKey("menu_item.menu_item_id"), nullable=False)                         
     quantity = db.Column(db.Integer, nullable=False)
     special_instructions = db.Column(db.String(100))
 
+    menu_item = db.relationship('MenuItem',                                            #* GAD - Added Database Relationship
+                                backref='order_items')                     
+
+    menu_item_id = db.Column(db.Integer,db.ForeignKey("menu_item.menu_item_id"), nullable=False)                         
     def __init__(self, order_id, menu_item_id, quantity, special_instructions):
         #self.order_item_id = order_item_id                                            #* GAD - Removed auto-incrementing ID from __init__
         self.order_id = order_id
@@ -223,24 +232,22 @@ def menu_items(category_id):
      
 @app.route('/payment/<int:table_id>', methods=['GET','POST'])
 def payment(table_id):
-     print(f"Which Table: { table_id }")
      if request.method == 'POST':
         order_id = request.form['order_no']
         payment_method = request.form['payment_manager']
+        order_to_delete = Order.query.get_or_404(order_id)
         try:
-            print(f"payment method: {payment_method}")
-            db.session.add(Payment(order_id, 50, payment_method))
-            # db.session.delete(Order.order_id == order_id)
+            db.session.add(Payment(order_id, order_to_delete.total_cost, payment_method))
+            db.session.delete(order_to_delete)
             db.session.commit()
-            return redirect('/payment_manager')
+            return redirect(f'/payment/{table_id}')
         except:
                return 'There was an issue opening the menu'
      else:
         orders_at_table = db.session.query(Order).join(Table, Order.table_id == table_id).all()
-        for order in orders_at_table:
-            print(f"Order ID, Table ID: {order.order_id}, {order.table_id}")
         payments = Payment.query.order_by(Payment.payment_id).all()
-        return render_template('payment_manager.html', 
+        return render_template('payment_manager.html',
+                               table_id = table_id, 
                                payments = payments, 
                                orders_at_table = orders_at_table)
     

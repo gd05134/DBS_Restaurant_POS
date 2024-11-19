@@ -34,7 +34,8 @@
             <input type="submit" name="Enter Info">
         </form>
     </div> -->
-    <div class="form-container">
+    <div class="container">
+    <div class="form-container-non-centered">
         <form action="/reservation_manager" method="POST">
             <h5>Add Customer</h5>
             <h6>First Name</h6>
@@ -50,7 +51,7 @@
             <input type="submit" name="Enter Info">
         </form>
     </div>
-    <table class="reservation-display">
+    <table class="table">
         <tr>
           <th>ID</th>
           <th>Name</th>
@@ -68,5 +69,6 @@
         </tr>
         {% endfor %}
     </table>
+    </div>
 </div>
 {% endblock %}
