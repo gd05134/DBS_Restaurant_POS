@@ -47,6 +47,12 @@
                         <button type="submit">Modify Order</button>
                     </form>
                 </td>
+                <td> 
+                    <form method="GET" action="/menu">
+                        <input type="hidden" name="order_id" value="{{ order.order_id }}">
+                        <button type="submit">Modify Order</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         

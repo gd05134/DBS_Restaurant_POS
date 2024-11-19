@@ -63,6 +63,9 @@ class Payment(db.Model):
     payment_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     order_id = db.Column(db.Integer,db.ForeignKey("order.order_id"), nullable=False)        
     amount = db.Column(db.Float, nullable=False)                                            
+    payment_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    order_id = db.Column(db.Integer,db.ForeignKey("order.order_id"), nullable=False)        
+    amount = db.Column(db.Float, nullable=False)                                            
     payment_method = db.Column(db.String(20), nullable=False)
     payment_date = db.Column(db.DateTime, default = datetime.today(), nullable=False)
 
@@ -73,6 +76,7 @@ class Payment(db.Model):
 
 #MenuCategory Schema
 class MenuCat(db.Model):
+    category_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     category_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     name = db.Column(db.String(30), unique=True, nullable=False)                                  
 
@@ -85,7 +89,10 @@ class MenuCat(db.Model):
 #MenuItem Schema
 class MenuItem(db.Model): 
     menu_item_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    menu_item_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     category_id = db.Column(db.Integer, db.ForeignKey("menu_cat.category_id"), nullable=False)
+    name = db.Column(db.String(50), unique=True, nullable=False)                              
+    price = db.Column(db.Float, nullable=False)                                               
     name = db.Column(db.String(50), unique=True, nullable=False)                              
     price = db.Column(db.Float, nullable=False)                                               
 
@@ -96,6 +103,7 @@ class MenuItem(db.Model):
         
 #OrderItem Schema
 class OrderItem(db.Model):
+    order_item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     order_item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     order_id = db.Column(db.Integer,db.ForeignKey("order.order_id"), nullable=False)
     menu_item_id = db.Column(db.Integer,db.ForeignKey("menu_item.menu_item_id"), nullable=False)                         
@@ -111,7 +119,8 @@ class OrderItem(db.Model):
         self.quantity = quantity
         self.special_instructions = special_instructions
 
-#Main Restaurant Layout
+
+
 @app.route('/', methods=['GET','POST'])
 def index():
     if request.method == 'POST':
@@ -168,7 +177,8 @@ def order(table_id):
         
         return render_template('order_manager.html', table = table, orders = processed_orders)
 
-#For reservations
+
+
 @app.route('/reservation_manager', methods=['GET','POST'])
 def add_reservation():
     if request.method == 'POST':
@@ -190,6 +200,9 @@ def add_reservation():
         customers = Customer.query.order_by(Customer.cust_id).all()
         return render_template('reservation_manager.html', customers = customers)
 
+
+
+@app.route('/menu', methods=['GET', 'POST'])
 
 
 @app.route('/menu', methods=['GET', 'POST'])
@@ -235,6 +248,7 @@ def menu():
 
 
 @app.route('/menu_items/<int:category_id>')
+@app.route('/menu_items/<int:category_id>')
 def menu_items(category_id):
     items = MenuItem.query.filter_by(category_id=category_id).all()
     items_data = [{'name': item.name, 'price': item.price, 'item_id':item.menu_item_id} for item in items]
@@ -244,24 +258,28 @@ def menu_items(category_id):
 
 @app.route('/payment/<int:table_id>', methods=['GET','POST'])
 def payment(table_id):
+     print(f"Which Table: { table_id }")
      if request.method == 'POST':
         order_id = request.form['order_no']
         payment_method = request.form['payment_manager']
-        order_to_delete = Order.query.get_or_404(order_id)
         try:
-            db.session.add(Payment(order_id, order_to_delete.total_cost, payment_method))
-            db.session.delete(order_to_delete)
+            print(f"payment method: {payment_method}")
+            db.session.add(Payment(order_id, 50, payment_method))
             db.session.commit()
             return redirect(f'/payment/{table_id}')
         except:
                return 'There was an issue opening the menu'
      else:
         orders_at_table = db.session.query(Order).join(Table, Order.table_id == table_id).all()
+        for order in orders_at_table:
+            print(f"Order ID, Table ID: {order.order_id}, {order.table_id}")
         payments = Payment.query.order_by(Payment.payment_id).all()
-        return render_template('payment_manager.html',
-                               table_id = table_id, 
+        return render_template('payment_manager.html', 
                                payments = payments, 
+                               table_id = table_id,
                                orders_at_table = orders_at_table)
+        
+
     
     
     
@@ -295,15 +313,71 @@ def submit_order():
         new_order = Order(table_id=table_id, order_time=datetime.now(), total_cost=total_cost)
         db.session.add(new_order)
         db.session.commit()
+    order_id = order_data.get('order_id')
 
+    if order_id:
+        order = Order.query.get(order_id)
+        if order:
+            order.total_cost = total_cost
+            db.session.commit()
+
+            OrderItem.query.filter_by(order_id=order_id).delete()
+            db.session.commit()
+
+            for item in order_items:
+                order_item = OrderItem(order_id=order.order_id, menu_item_id=item["item_id"], 
+                                       quantity=item['quantity'], special_instructions="")
+                db.session.add(order_item)
+
+            db.session.commit()
+        else:
+            return jsonify({"success": False, "message": "Order not found."})
+
+    else:
+        new_order = Order(table_id=table_id, order_time=datetime.now(), total_cost=total_cost)
+        db.session.add(new_order)
+        db.session.commit()
+
+        for item in order_items:
+            order_item = OrderItem(order_id=new_order.order_id, menu_item_id=item["item_id"], 
+                                quantity=item['quantity'], special_instructions="")
+            db.session.add(order_item)
         for item in order_items:
             order_item = OrderItem(order_id=new_order.order_id, menu_item_id=item["item_id"], 
                                 quantity=item['quantity'], special_instructions="")
             db.session.add(order_item)
 
         db.session.commit()
+        db.session.commit()
 
     return jsonify({"success": True})
+
+
+
+@app.route('/get_order_items/<int:order_id>')
+def get_order_items(order_id):
+    order_items = (
+        db.session.query(
+            OrderItem.menu_item_id,
+            MenuItem.name,
+            OrderItem.quantity,
+            MenuItem.price
+        )
+        .join(MenuItem, OrderItem.menu_item_id == MenuItem.menu_item_id)
+        .filter(OrderItem.order_id == order_id)
+        .all()
+    )
+
+    order_items_data = [{
+        'name': item.name,
+        'quantity': item.quantity,
+        'price': item.price,
+        'item_id': item.menu_item_id
+    } for item in order_items]
+
+    return jsonify(order_items_data)
+
+
 
 
 
