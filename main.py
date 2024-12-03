@@ -226,17 +226,5 @@ def get_order_items(order_id):
 def favicon():
     return send_from_directory(directory='.', path='favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-#Search Manager Layout
-@app.route('/search_manager', methods=['GET','POST'])
-def search():
-    if request.method == 'POST':
-        try:
-            db.session.commit()
-            return redirect('/search_manager')
-        except:
-               return 'There was an issue opening the order'
-    else:
-        return render_template('search_manager.html')
-
 if __name__ == '__main__':
      app.run(debug=True)
